@@ -31,9 +31,7 @@ def get_results(query: str):
     return results
 
 def split_text(text: str):
-    chunks = tokenize.sent_tokenize(text, language="english")
-    print(chunks)
-    
+    chunks = tokenize.sent_tokenize(text)
     i = 0
     while i < len(chunks):
         words = chunks[i].split()
@@ -45,12 +43,17 @@ def split_text(text: str):
             del chunks[i]
             i -= 1
         i += 1
-            
-    print(chunks)
     return chunks
 
-for result in get_results("test"):
-    print(result.title)
-    print(result.link)
-    print(result.words)
-    print('\n')
+for chunk in split_text("test"):
+    print(chunk)
+    print("Results:")
+    results = get_results(chunk)
+    if len(results) == 0:
+        print("No matches")
+    for result in results:
+        print(result.title)
+        print(result.link)
+        print(result.words)
+        print()
+    print ('----------------')
