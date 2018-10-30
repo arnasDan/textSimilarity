@@ -2,6 +2,13 @@ from bs4 import BeautifulSoup
 import requests
 from nltk import tokenize
 import docx2txt
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument(dest="filename",
+                    help="Name of file to be checked.", metavar="FILE")
+
+args = parser.parse_args()
 
 class Result:
     title: str
@@ -46,7 +53,7 @@ def split_text(text: str):
     return chunks
 
 try:
-    document_text = docx2txt.process("test.docx")
+    document_text = docx2txt.process(args.filename)
 except FileNotFoundError:
     print("No such file found")
     exit()
