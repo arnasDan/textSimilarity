@@ -51,7 +51,7 @@ def split_text(text: str):
     return chunks
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
-filename = gui.PopupGetFile("Choose a file:", file_types=(("Word documents (*.docx)", "*.docx"),))
+filename = gui.PopupGetFile("Choose a document to check:", file_types=(("Word documents (*.docx)", "*.docx"),))
 
 try:
     document_text = docx2txt.process(filename)
@@ -60,15 +60,17 @@ except FileNotFoundError:
     exit()
 
 results = []
-for chunk in split_text(document_text):
+source_chunks = split_text(document_text)
+for i, chunk in enumerate(source_chunks):
+    gui.OneLineProgressMeter('Executing searches...', i + 1, len(source_chunks), 'key')
     results.extend(get_results(chunk))
 
-layout = [[gui.T('Table Test')]]
+layout = [[gui.T('')]]
 for result in results:
     layout.append([
         gui.T(result.source_chunk, background_color='white', pad=(1,1)),
         gui.T(result.title, background_color='white', pad=(1,1)),
         gui.T(result.link, background_color='white', pad=(1,1)),
         gui.T('; '.join(result.words), background_color='white', pad=(1,1))
-        ])
-gui.FlexForm('Table', grab_anywhere=True).LayoutAndRead(layout)
+    ])
+gui.FlexForm('Results', grab_anywhere=True).LayoutAndRead(layout)
