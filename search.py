@@ -6,29 +6,26 @@ import PySimpleGUI as gui
 import ctypes
 
 class Result:
-    source_chunk: str
     title: str
     link: str
     words: list
-    def __init__(self, title, link, words, chunk):
+    def __init__(self, title, link, words):
         self.title = title
         self.link = link
         self.words = words
-        self.source_chunk = chunk
 
 def get_results(query: str):
     results = []
     media_html = requests.get('https://www.google.com/search?q=' + query.replace(" ", "+")).text
     soup = BeautifulSoup(media_html, 'lxml')
     results_block = soup.find("div", id="ires")
-    for result in results_block.find_all("div", class_="g"):
+    for result in results_block.find_all(lambda tag: tag.name == 'div' and tag.get('class') == ['g']):
         link = result.find("a").get('href')
         if "http" not in link:
             continue
         new_result = Result(title=result.find("h3").get_text(),
                             link=link.split("://")[1].split('/')[0],
-                            words=[],
-                            chunk=query)
+                            words=[])
         for word in result.find_all("b"):
             if word.string != "...":
                 new_result.words.append(word.string)
@@ -47,30 +44,45 @@ def split_text(text: str):
             chunks[i - 1] += ' ' + ' '.join(words)
             del chunks[i]
             i -= 1
+        else:
+            chunks[i] = ' '.join(words)
         i += 1
     return chunks
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 filename = gui.PopupGetFile("Choose a document to check:", file_types=(("Word documents (*.docx)", "*.docx"),))
+if (filename is None):
+    exit()
 
 try:
     document_text = docx2txt.process(filename)
 except FileNotFoundError:
     gui.Popup("Cannot find file specified")
     exit()
+except PermissionError:
+    gui.Popup("Cannot access file")
+    exit()
 
-results = []
+results = dict()
 source_chunks = split_text(document_text)
 for i, chunk in enumerate(source_chunks):
     gui.OneLineProgressMeter('Executing searches...', i + 1, len(source_chunks), 'key')
-    results.extend(get_results(chunk))
+    results[chunk] = get_results(chunk)
 
-layout = [[gui.T('')]]
-for result in results:
-    layout.append([
-        gui.T(result.source_chunk, background_color='white', pad=(1,1)),
-        gui.T(result.title, background_color='white', pad=(1,1)),
-        gui.T(result.link, background_color='white', pad=(1,1)),
-        gui.T('; '.join(result.words), background_color='white', pad=(1,1))
+gui.SetOptions(element_padding=(0,0))
+column_layout = [[]]
+width = 30 #round(max(len(result.source_chunk) for result in results.values()) / 8) + 10
+for result in results.items():
+    column_layout.append([gui.Multiline(result[0])])
+    column_layout.append([
+        (gui.T(
+            res.title + '\n' + res.link + '\n' + '; '.join(res.words),
+            background_color='white',
+            pad=(1,1),
+            size=(32, 1))
+        ) for res in result[1]
     ])
-gui.FlexForm('Results', grab_anywhere=True).LayoutAndRead(layout)
+layout = [  [gui.T('Results:', font='Any 18')],
+            [gui.Column(column_layout, size=(800,600), scrollable=True)] ]
+window = gui.Window('Search results').Layout(layout)
+window.Show()
