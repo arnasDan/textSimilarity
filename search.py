@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 from nltk import tokenize
-import docx2txt
 
 class Result:
     title: str
@@ -45,13 +44,7 @@ def split_text(text: str):
         i += 1
     return chunks
 
-try:
-    document_text = docx2txt.process("test.docx")
-except FileNotFoundError:
-    print("No such file found")
-    exit()
-
-for chunk in split_text(document_text):
+for chunk in split_text("test"):
     print(chunk)
     print("Results:")
     results = get_results(chunk)
