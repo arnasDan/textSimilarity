@@ -2,22 +2,19 @@ from bs4 import BeautifulSoup
 import requests
 from nltk import tokenize
 import docx2txt
-from argparse import ArgumentParser
-
-parser = ArgumentParser()
-parser.add_argument(dest="filename",
-                    help="Name of file to be checked.", metavar="FILE")
-
-args = parser.parse_args()
+import PySimpleGUI as gui
+import ctypes
 
 class Result:
+    source_chunk: str
     title: str
     link: str
     words: list
-    def __init__(self, title, link, words):
+    def __init__(self, title, link, words, chunk):
         self.title = title
         self.link = link
         self.words = words
+        self.source_chunk = chunk
 
 def get_results(query: str):
     results = []
@@ -30,7 +27,8 @@ def get_results(query: str):
             continue
         new_result = Result(title=result.find("h3").get_text(),
                             link=link.split("://")[1].split('/')[0],
-                            words=[])
+                            words=[],
+                            chunk=query)
         for word in result.find_all("b"):
             if word.string != "...":
                 new_result.words.append(word.string)
@@ -52,21 +50,25 @@ def split_text(text: str):
         i += 1
     return chunks
 
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
+filename = gui.PopupGetFile("Choose a file:", file_types=(("Word documents (*.docx)", "*.docx"),))
+
 try:
-    document_text = docx2txt.process(args.filename)
+    document_text = docx2txt.process(filename)
 except FileNotFoundError:
-    print("No such file found")
+    gui.Popup("Cannot find file specified")
     exit()
 
+results = []
 for chunk in split_text(document_text):
-    print(chunk)
-    print("Results:")
-    results = get_results(chunk)
-    if len(results) == 0:
-        print("No matches")
-    for result in results:
-        print(result.title)
-        print(result.link)
-        print(result.words)
-        print()
-    print ('----------------')
+    results.extend(get_results(chunk))
+
+layout = [[gui.T('Table Test')]]
+for result in results:
+    layout.append([
+        gui.T(result.source_chunk, background_color='white', pad=(1,1)),
+        gui.T(result.title, background_color='white', pad=(1,1)),
+        gui.T(result.link, background_color='white', pad=(1,1)),
+        gui.T('; '.join(result.words), background_color='white', pad=(1,1))
+        ])
+gui.FlexForm('Table', grab_anywhere=True).LayoutAndRead(layout)
