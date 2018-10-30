@@ -1,4 +1,3 @@
-from selenium import webdriver
 from bs4 import BeautifulSoup
 import requests
 from nltk import tokenize
@@ -38,7 +37,7 @@ def split_text(text: str):
         if len(words) > 32:
             chunks.insert(i + 1, ' '.join(words[32:]))
             chunks[i] = ' '.join(words[:32])
-        elif len(words) + len(chunks[i - 1].split()) <= 32:
+        elif i > 0 and len(words) + len(chunks[i - 1].split()) <= 32:
             chunks[i - 1] += ' ' + ' '.join(words)
             del chunks[i]
             i -= 1
