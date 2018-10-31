@@ -5,6 +5,7 @@ import docx2txt
 import PySimpleGUI as gui
 import ctypes
 import textwrap
+import argparse
 
 class Result:
     title: str
@@ -55,8 +56,14 @@ def split_text(text: str):
         i += 1
     return chunks
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--file', '-f', dest='filename', help='file name of docx document to be checked')
+
+args = parser.parse_args()
+
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
-filename = gui.PopupGetFile("Choose a document to check:", file_types=(("Word documents (*.docx)", "*.docx"),))
+filename = args.filename or gui.PopupGetFile("Choose a document to check:", file_types=(("Word documents (*.docx)", "*.docx"),))
 if (filename == None):
     exit()
 
