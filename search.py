@@ -8,13 +8,15 @@ class Result:
     search_string: str
     results: str
     def __str__(self):
-        return '<input id="block-header" readonly value="' + self.search_string + '"> \n' + self.results
+        return '<input class="block-header" readonly value="' + self.search_string + '"> \n' + self.results
 
 def get_results(query: str):
-    results = []
     media_html = requests.get('https://www.google.com/search?q=' + query.replace(" ", "+")).text
     soup = BeautifulSoup(media_html, 'lxml')
-    results = soup.find("div", id="ires")
+    results = soup.find('div', id='ires')
+    #TODO: these two lines are not validated, check if they work.        
+    del results['id'] 
+    results['class'] = 'ires'
     return Result(query, str(results))
 
 def split_text(text: str):
