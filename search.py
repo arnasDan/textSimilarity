@@ -13,8 +13,7 @@ class Result:
 def get_results(query: str):
     media_html = requests.get('https://www.google.com/search?q=' + query.replace(" ", "+")).text
     soup = BeautifulSoup(media_html, 'lxml')
-    results = soup.find('div', id='ires')
-    #TODO: these two lines are not validated, check if they work.        
+    results = soup.find('div', id='ires')     
     del results['id'] 
     results['class'] = 'ires'
     return Result(query, str(results))

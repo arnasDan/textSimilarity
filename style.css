@@ -63,6 +63,7 @@ li {
 a:link {
     cursor: pointer;
     pointer-events: none;
+    display: inline-block;
 }
 
 body {
@@ -78,7 +79,7 @@ body {
     word-wrap: break-word
 }
 
-#block-header {
+.block-header {
     border-radius: 8px;
     box-shadow: none;
     height: auto;
