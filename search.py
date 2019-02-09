@@ -17,20 +17,24 @@ def get_results(query: str):
     #replace ires id with ires class so that multiple can be included     
     del results['id']
     results['class'] = 'ires'
-    #replace video results with regular-style results (no thumbnail)
-    for table_element in soup.find_all(['table', 'tbody', 'tr']):
-        table_element.unwrap()
-    for td in soup.find_all('td'):
-        if (td.find('span', {'class': 'st'})):
-            td.name = 'div'
-            del td['style']
-            del td['valign']
-            td['class'] = 's'
-        elif (td.find('h3')):
-            td.unwrap()
-        else:
-           td.extract()
-
+    #loop through the results and make some changes
+    for result in soup.find_all('div', {'class': 'g'}):   
+        #replace video results with regular-style results (no thumbnail)
+        for table_element in result.find_all(['table', 'tbody', 'tr']):
+            table_element.unwrap()
+        for td in result.find_all('td'):
+            if td.find('span', {'class': 'st'}):
+                td.name = 'div'
+                del td['style']
+                del td['valign']
+                td['class'] = 's'
+            elif (td.find('h3')):
+                td.unwrap()
+            else:
+                td.extract()
+        #exclude image results
+        if result.find('img'):
+            result.extract()
     return Result(query, str(results))
 
 def split_text(text: str):

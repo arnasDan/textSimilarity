@@ -10,6 +10,10 @@ cors = CORS(app)
 def serve_page(path):
     return send_from_directory('pages', path)
 
+@app.route('/')
+def serve_root():
+    return serve_page('index.html')
+
 @app.route('/process_text')
 def process_text():
     search_string = request.args['text']

@@ -102,3 +102,7 @@ body {
 #results {
     margin-top: 2px;
 }
+
+html {
+    overflow-y: scroll;
+  }
