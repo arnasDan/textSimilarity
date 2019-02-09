@@ -6,28 +6,32 @@
             if (Office.context.requirements.isSetSupported('WordApi', 1.1)) {
                 $('#searchSelection').click(searchSelection);
                 $('#searchAll').click(searchAll);
-                $('#supportedVersion').html('This code is using Word 2016 or later.');
             }
             else {
-                $('#supportedVersion').html('This code requires Word 2016 or later.');
+                $('body').html('Word 2016 or later is required to use this add-in.');
             }
         });
     };
 
     function searchText(text) {
-        $.ajax({
-            url: "process_text",
-            data: {
-                text: text
-            },
-            type: "GET",
-            dataType: "html",
-            success: function(results) {
-                $('#results').html(results);
-            },
-            error: function(xhr, status) {
-                console.log(status);
-            }
+        $('#results').fadeOut('normal', function () {
+            $('#results-spinner').show();
+            $.ajax({
+                url: "process-text",
+                data: {
+                    text: text
+                },
+                type: "GET",
+                dataType: "html",
+                success: function(results) {
+                    $('#results-spinner').hide();
+                    $('#results').html(results);
+                    $('#results').fadeIn();
+                },
+                error: function(xhr, status) {
+                    console.log(status);
+                }
+            });
         });
     }
 

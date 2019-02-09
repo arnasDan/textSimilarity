@@ -14,7 +14,7 @@ def serve_page(path):
 def serve_root():
     return serve_page('index.html')
 
-@app.route('/process_text')
+@app.route('/process-text')
 def process_text():
     search_string = request.args['text']
     if not search_string.strip():
