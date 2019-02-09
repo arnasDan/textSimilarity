@@ -90,3 +90,7 @@ body {
     padding: 1%;
     border: 1px solid #dfe1e5;
 }
+
+.process-button:hover {
+    background: #dfe1e5;
+}

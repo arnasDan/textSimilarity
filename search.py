@@ -8,7 +8,7 @@ class Result:
     search_string: str
     results: str
     def __str__(self):
-        return '<input class="block-header" readonly value="' + self.search_string + '"> \n' + self.results
+        return '<input class="block-header" readonly value="%s">\n%s' % (self.search_string, self.results)
 
 def get_results(query: str):
     media_html = requests.get('https://www.google.com/search?q=' + query.replace(" ", "+")).text

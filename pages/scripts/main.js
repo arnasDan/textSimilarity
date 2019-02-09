@@ -4,7 +4,8 @@
     Office.initialize = function (reason) {
         $(document).ready(function () {
             if (Office.context.requirements.isSetSupported('WordApi', 1.1)) {
-                $('#processSelection').click(processSelection);
+                $('#searchSelection').click(searchSelection);
+                $('#searchAll').click(searchAll);
                 $('#supportedVersion').html('This code is using Word 2016 or later.');
             }
             else {
@@ -13,32 +14,41 @@
         });
     };
 
-    function processSelection() {
-        var text;
+    function searchText(text) {
+        $.ajax({
+            url: "process_text",
+            data: {
+                text: text
+            },
+            type: "GET",
+            dataType: "html",
+            success: function(results) {
+                $('#results').html(results);
+            },
+            error: function(xhr, status) {
+                console.log(status);
+            }
+        });
+    }
+
+    function searchAll() {
+        Word.run(function (context) {
+            var documentBody = context.document.body;
+            context.load(documentBody);
+            context.sync()
+                .then(function () {
+                    searchText(documentBody.text);
+                });
+        });
+    }
+
+    function searchSelection() {
         Word.run(function (context) {
             var range = context.document.getSelection();
             range.load('text');
             context.sync()
                 .then(function () {
-                    //$('#content-main').append(range.text);
-                    text = range.text;
-                    console.log(range.text + " test");
-                    $.ajax({
-                        url: "process_text",
-                        data: {
-                            text: range.text
-                        },
-                        type: "GET",
-                        dataType: "html",
-                        success: function(results) {
-                            $('#content-main').append(results);
-                        },
-                        error: function(xhr, status) {
-                            console.log(status);
-                        }
-                        
-                        
-                    });
+                    searchText(range.text);
                 });
         });
     };
