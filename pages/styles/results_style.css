@@ -94,3 +94,12 @@ body {
 .process-button:hover {
     background: #dfe1e5;
 }
+
+.s div {
+    word-wrap: break-word;
+    width: 100%;
+}
+
+#results {
+    margin-top: 2px;
+}
