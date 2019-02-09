@@ -4,13 +4,10 @@ import search
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/<path:path>')
 @cross_origin()
 def serve_page(path):
-    if path == 'index.html':
-        path = 'Home.html'
     return send_from_directory('pages', path)
 
 @app.route('/process_text')
