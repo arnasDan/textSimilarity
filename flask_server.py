@@ -26,5 +26,5 @@ def process_text():
         except Exception as e:
             return 'An error occured: %s \n Please try again later' % repr(e)
 
-if __name__ == "__main__":
-    app.run(port=3000, debug=True)
+def run_server(port=3000, debug=False):
+    app.run(port=port, debug=debug)
