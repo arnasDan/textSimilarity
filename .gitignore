@@ -103,14 +103,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# test documents
-*.docx
-
-# node modules
-node_modules/
-
-# results html
-results.html
-
 # vscode
 .vscode/
